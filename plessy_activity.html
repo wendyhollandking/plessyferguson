@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plessy v. Ferguson: Cause &amp; Effect</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    const EVENTS = [
+      { id: 1, text: "Reconstruction ends. White supremacist governments return to power across the South, rolling back the political and civil gains Black Americans had made.", correctOrder: 1 },
+      { id: 2, text: "Louisiana passes the Separate Car Act of 1890, legally requiring Black and white passengers to ride in separate railroad cars.", correctOrder: 2 },
+      { id: 3, text: "The Committee of Citizens — a group of Black activists in New Orleans — organizes a deliberate legal challenge to the Separate Car Act, carefully planning every detail in advance.", correctOrder: 3 },
+      { id: 4, text: 'Homer Plessy, who is 1/8 Black, boards a "Whites Only" car on the East Louisiana Railroad. When asked his race, he identifies himself as Black and refuses to move.', correctOrder: 4 },
+      { id: 5, text: "A private detective, hired by the Committee of Citizens, arrests Plessy specifically for violating the Separate Car Act — exactly as planned.", correctOrder: 5 },
+      { id: 6, text: "The Louisiana state court upholds Plessy's conviction. The Committee of Citizens appeals the case, pushing it toward the U.S. Supreme Court.", correctOrder: 6 },
+      { id: 7, text: "Plessy's lawyers argue before the Supreme Court that the Separate Car Act violates the 13th and 14th Amendments — which abolished slavery and guaranteed equal citizenship.", correctOrder: 7 },
+      { id: 8, text: 'The Supreme Court rules 7–1 in favor of Ferguson. The majority opinion holds that "separate but equal" facilities do not violate the Constitution.', correctOrder: 8 },
+      { id: 9, text: "Justice John Marshall Harlan issues the sole dissent, arguing that the white race's claim to dominance is unconstitutional and that the Constitution must be colorblind.", correctOrder: 9 },
+      { id: 10, text: "Plessy v. Ferguson legally codifies racial segregation across the United States, providing the constitutional foundation for Jim Crow laws for nearly 60 years.", correctOrder: 10 },
+    ];
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    const BROWN_QUOTE = `"We consider the underlying fallacy of the plaintiff's argument to consist in the assumption that the enforced separation of the two races stamps the colored race with a badge of inferiority. If this be so, it is not by reason of anything found in the act, but solely because the colored race chooses to put that construction upon it."`;
+
+    const HARLAN_QUOTE = `"The white race deems itself to be the dominant race in this country... But in view of the Constitution, in the eye of the law, there is in this country no superior, dominant, ruling class of citizens. There is no caste here. Our Constitution is color-blind, and neither knows nor tolerates classes among citizens."`;
+
+    function PlessyActivity() {
+      const [items, setItems] = useState(() => shuffle(EVENTS));
+      const [dragIndex, setDragIndex] = useState(null);
+      const [checked, setChecked] = useState(false);
+      const [showQuotes, setShowQuotes] = useState(false);
+      const [submitted, setSubmitted] = useState(false);
+
+      const isCorrect = () => items.every((item, idx) => item.correctOrder === idx + 1);
+
+      const handleDragStart = (idx) => setDragIndex(idx);
+
+      const handleDrop = (targetIdx) => {
+        if (dragIndex === null || dragIndex === targetIdx) return;
+        const next = [...items];
+        const [moved] = next.splice(dragIndex, 1);
+        next.splice(targetIdx, 0, moved);
+        setItems(next);
+        setDragIndex(null);
+        setChecked(false);
+        setSubmitted(false);
+      };
+
+      const handleCheck = () => {
+        setChecked(true);
+        setSubmitted(true);
+        if (isCorrect()) setShowQuotes(true);
+      };
+
+      const handleReset = () => {
+        setItems(shuffle(EVENTS));
+        setChecked(false);
+        setShowQuotes(false);
+        setSubmitted(false);
+      };
+
+      const correct = isCorrect();
+
+      return (
+        <div className="min-h-screen bg-stone-50 font-sans">
+          <div className="bg-blue-900 text-white px-6 py-5">
+            <div className="max-w-3xl mx-auto">
+              <h1 className="text-2xl font-bold leading-tight">
+                Plessy v. Ferguson: Cause &amp; Effect
+              </h1>
+            </div>
+          </div>
+
+          <div className="max-w-3xl mx-auto px-4 py-6">
+            <div className="bg-blue-50 border-l-4 border-blue-700 rounded-r p-4 mb-6">
+              <p className="font-semibold text-blue-900 mb-1">How to use this activity</p>
+              <p className="text-blue-800 text-sm">
+                The ten events below are out of order. Drag and drop each card to arrange
+                them in the correct chronological sequence — from the end of Reconstruction
+                to the legacy of Plessy v. Ferguson. When you're ready, click <strong>Check My Order</strong> to see how you did.
+              </p>
+            </div>
+
+            <div className="space-y-2 mb-6">
+              {items.map((item, idx) => {
+                let cardStyle = "bg-white border border-stone-200 shadow-sm";
+                let numberStyle = "bg-stone-600 text-white";
+                let feedback = null;
+
+                if (checked) {
+                  if (item.correctOrder === idx + 1) {
+                    cardStyle = "bg-green-50 border border-green-400 shadow-sm";
+                    numberStyle = "bg-green-600 text-white";
+                    feedback = <span className="text-green-700 text-xs font-semibold ml-2">✓ Correct</span>;
+                  } else {
+                    cardStyle = "bg-red-50 border border-red-300 shadow-sm";
+                    numberStyle = "bg-red-500 text-white";
+                    feedback = <span className="text-red-600 text-xs font-semibold ml-2">✗ Should be #{item.correctOrder}</span>;
+                  }
+                }
+
+                return (
+                  <div
+                    key={item.id}
+                    draggable
+                    onDragStart={() => handleDragStart(idx)}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={() => handleDrop(idx)}
+                    className={`${cardStyle} rounded-lg p-3 flex items-start gap-3 cursor-grab active:cursor-grabbing transition-all`}
+                  >
+                    <div className={`${numberStyle} rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold shrink-0 mt-0.5`}>
+                      {idx + 1}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-stone-800 text-sm leading-relaxed">{item.text}</p>
+                      {feedback}
+                    </div>
+                    <div className="text-stone-300 text-lg shrink-0 self-center select-none">⠿</div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex gap-3 mb-8">
+              <button onClick={handleCheck} className="bg-blue-800 hover:bg-blue-900 text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors">
+                Check My Order
+              </button>
+              <button onClick={handleReset} className="bg-stone-200 hover:bg-stone-300 text-stone-700 font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors">
+                Reset &amp; Shuffle
+              </button>
+            </div>
+
+            {submitted && (
+              <div className={`rounded-lg p-4 mb-8 ${correct ? "bg-green-100 border border-green-400 text-green-900" : "bg-amber-50 border border-amber-300 text-amber-900"}`}>
+                {correct ? (
+                  <>
+                    <p className="font-bold text-lg mb-1">✓ Perfect — you have the right order!</p>
+                    <p className="text-sm">Now read the two justices' opinions below. They tell very different stories about what the Constitution means.</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-bold mb-1">Not quite — keep trying.</p>
+                    <p className="text-sm">The cards marked in red are in the wrong position. Look at the "Should be #" hints and try rearranging them. Think about what had to happen <em>before</em> each event could occur.</p>
+                  </>
+                )}
+              </div>
+            )}
+
+            {showQuotes && (
+              <div className="mt-2">
+                <div className="border-t-4 border-blue-800 pt-6 mb-4">
+                  <h2 className="text-xl font-bold text-blue-900 mb-1">Two Justices, Two Visions</h2>
+                  <p className="text-stone-600 text-sm">The Supreme Court's 7–1 decision produced two very different opinions. Read both carefully before answering your Ohm questions.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="bg-red-700 text-white text-xs font-bold uppercase tracking-widest px-2 py-1 rounded inline-block mb-3">Majority Opinion</div>
+                    <p className="font-bold text-stone-800 mb-1">Justice Henry Brown</p>
+                    <p className="text-stone-500 text-xs mb-3">Writing for the 7-justice majority</p>
+                    <blockquote className="text-stone-700 text-sm leading-relaxed italic border-l-4 border-red-300 pl-3">{BROWN_QUOTE}</blockquote>
+                  </div>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="bg-green-700 text-white text-xs font-bold uppercase tracking-widest px-2 py-1 rounded inline-block mb-3">Dissenting Opinion</div>
+                    <p className="font-bold text-stone-800 mb-1">Justice John Marshall Harlan</p>
+                    <p className="text-stone-500 text-xs mb-3">The sole dissenting vote</p>
+                    <blockquote className="text-stone-700 text-sm leading-relaxed italic border-l-4 border-green-400 pl-3">{HARLAN_QUOTE}</blockquote>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                  <p className="text-blue-900 font-semibold text-sm mb-1">Think about it before you move on:</p>
+                  <ul className="text-blue-800 text-sm space-y-1 list-disc list-inside">
+                    <li>Justice Brown says that if separation feels like inferiority, that feeling comes from Black Americans themselves — not from the law. Do you find this argument convincing? Why or why not?</li>
+                    <li>Justice Harlan uses the word "colorblind" to describe the Constitution. What does he mean by this — and how does this differ from Brown's interpretation?</li>
+                    <li>Harlan's dissent was ignored for nearly 60 years. What changed in America that eventually made his view the law of the land?</li>
+                  </ul>
+                </div>
+
+                <div className="bg-stone-100 border border-stone-300 rounded-lg p-4 text-center">
+                  <p className="text-stone-700 font-semibold text-sm">✓ Activity complete — continue to your Ohm practice questions.</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<PlessyActivity />);
+  </script>
+</body>
+</html>
